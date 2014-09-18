@@ -1,7 +1,8 @@
 require 'capybara/rspec'
 require 'selenium/webdriver'
-require 'byebug'
 require 'support'
+require 'site_prism'
+Dir[File.expand_path("../../lib/*.rb", __FILE__)].each{ |f| require f }
 
 Capybara.register_driver :selenium do | app |
   Capybara::Selenium::Driver.new(app, :browser => :firefox)

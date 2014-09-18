@@ -1,12 +1,15 @@
 require 'spec_helper'
 
 def perform_search_for(keyword)
-  fill_in 'term', with: keyword
-  click_button 'submit_desk'
+  home.search_field.set keyword
+  home.search.click
 end
 
 describe "User visit the home page" do
-  before { visit "https://www.blinkboxbooks.com" }
+  let(:home) { Home.new }
+  let(:search_result) { SearchResult.new }
+
+  before { home.load }
 
   context "then perform a book search" do
     context "with term 'stephen Hawking'" do
@@ -16,8 +19,10 @@ describe "User visit the home page" do
       end
 
       context "then select a random book to view" do
+        let(:book_detail) { BookDetail.new }
+
         before do
-          book    = all('#search .book').to_a.first
+          book    = search_result.books.first
           @title  = book.find('.title').text
           @author = book.find('.author').text
           @price  = book.find('.price').text
@@ -25,9 +30,9 @@ describe "User visit the home page" do
         end
 
         it "should display the same the book attributes as home page" do
-          title_on_detail_page  = find('.book-data .title').text.upcase
-          author_on_detail_page = find('.book-data .author').text
-          price_on_detail_page  = find('.book-data .price').text
+          title_on_detail_page  = book_detail.title.text.upcase
+          author_on_detail_page = book_detail.author.text
+          price_on_detail_page  = book_detail.price.text
           expect(title_on_detail_page).to eql(@title)
           expect(author_on_detail_page).to eql(@author)
           expect(price_on_detail_page).to eql(@price)
@@ -35,9 +40,8 @@ describe "User visit the home page" do
 
         context "on display page" do
           it "book sample can be looked through" do
-            right_arrow = find('#individual-book .right-arrow')
-            right_arrow.click while right_arrow.visible?
-            expect(find('#individual-book .progress').text).to eq('100% read')
+            book_detail.right_arrow.click while book_detail.has_right_arrow?
+            expect(book_detail.sample_progress.text).to eq('100% read')
           end
         end
       end
@@ -50,7 +54,7 @@ describe "User visit the home page" do
       end
 
       it "then title of the first result is equal to the 'Alice’s Adventures in Wonderland (COLLINS CLASSICS)'" do
-        first_book = all('#search .book').to_a.first
+        first_book = search_result.books.first
         title = first_book.find('.title').text.upcase
         expect(title).to eq('Alice’s Adventures in Wonderland (COLLINS CLASSICS)'.upcase)
       end
