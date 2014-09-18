@@ -1,5 +1,7 @@
 require 'capybara/rspec'
 require 'selenium/webdriver'
+require 'byebug'
+require 'support'
 
 Capybara.register_driver :selenium do | app |
   Capybara::Selenium::Driver.new(app, :browser => :firefox)
